@@ -1,0 +1,147 @@
+   0  $accept : %entry% $end
+
+   1  main : expr EOL
+
+   2  expr : VAR
+   3       | FUN VAR IMP expr
+   4       | LPAREN expr RPAREN
+   5       | expr expr
+
+   6  %entry% : '\001' main
+
+state 0
+	$accept : . %entry% $end  (0)
+
+	'\001'  shift 1
+	.  error
+
+	%entry%  goto 2
+
+
+state 1
+	%entry% : '\001' . main  (6)
+
+	VAR  shift 3
+	LPAREN  shift 4
+	FUN  shift 5
+	.  error
+
+	main  goto 6
+	expr  goto 7
+
+
+state 2
+	$accept : %entry% . $end  (0)
+
+	$end  accept
+
+
+state 3
+	expr : VAR .  (2)
+
+	.  reduce 2
+
+
+state 4
+	expr : LPAREN . expr RPAREN  (4)
+
+	VAR  shift 3
+	LPAREN  shift 4
+	FUN  shift 5
+	.  error
+
+	expr  goto 8
+
+
+state 5
+	expr : FUN . VAR IMP expr  (3)
+
+	VAR  shift 9
+	.  error
+
+
+state 6
+	%entry% : '\001' main .  (6)
+
+	.  reduce 6
+
+
+state 7
+	main : expr . EOL  (1)
+	expr : expr . expr  (5)
+
+	VAR  shift 3
+	LPAREN  shift 4
+	EOL  shift 10
+	FUN  shift 5
+	.  error
+
+	expr  goto 11
+
+
+state 8
+	expr : LPAREN expr . RPAREN  (4)
+	expr : expr . expr  (5)
+
+	VAR  shift 3
+	LPAREN  shift 4
+	RPAREN  shift 12
+	FUN  shift 5
+	.  error
+
+	expr  goto 11
+
+
+state 9
+	expr : FUN VAR . IMP expr  (3)
+
+	IMP  shift 13
+	.  error
+
+
+state 10
+	main : expr EOL .  (1)
+
+	.  reduce 1
+
+
+state 11
+	expr : expr . expr  (5)
+	expr : expr expr .  (5)
+
+	.  reduce 5
+
+	expr  goto 11
+
+
+state 12
+	expr : LPAREN expr RPAREN .  (4)
+
+	.  reduce 4
+
+
+state 13
+	expr : FUN VAR IMP . expr  (3)
+
+	VAR  shift 3
+	LPAREN  shift 4
+	FUN  shift 5
+	.  error
+
+	expr  goto 14
+
+
+state 14
+	expr : FUN VAR IMP expr .  (3)
+	expr : expr . expr  (5)
+
+	VAR  shift 3
+	LPAREN  shift 4
+	RPAREN  reduce 3
+	EOL  reduce 3
+
+	expr  goto 11
+
+
+10 terminals, 4 nonterminals
+7 grammar rules, 15 states

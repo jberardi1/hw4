@@ -1,4 +1,4 @@
-open Ast
+(*open Ast*)
 
 (* invariant for substitutions: no id on a lhs occurs in any term earlier  *)
 (* in the list                                                             *)
@@ -68,9 +68,9 @@ let rec apply_list (subst: subst) (constraints : (typ * typ) list) : (typ * typ)
   |h::t -> 
   match h with 
   |(a1, a2)->
- (* let p1 = apply subst a1 
-  let p2 = apply subst a2 in *)
-  ((apply subst a1), (apply subst a2))::(apply_list subst t) 
+  let p1 = apply subst a1 
+  let p2 = apply subst a2 in 
+  (p1, p2)::(apply_list subst t) 
 ;;
 
 
